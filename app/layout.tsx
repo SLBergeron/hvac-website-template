@@ -9,7 +9,7 @@ import {
   getFormattedPhone,
   getSEO,
 } from "@/lib/template-config";
-import { Analytics } from "@vercel/analytics/next";
+import { Analytics } from "@vercel/analytics/react";
 
 // Get business data for metadata
 const business = getBusinessInfo();
