@@ -1,10 +1,10 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface ContactFormProps {
   phone: string;
   businessName: string;
-  webhookUrl?: string; // n8n webhook URL for Tier 2 customers
+  webhookUrl?: string; // n8n webhook URL for Tier 2+ customers
 }
 
 export const ContactForm: React.FC<ContactFormProps> = ({
@@ -20,32 +20,46 @@ export const ContactForm: React.FC<ContactFormProps> = ({
   });
 
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [honeypot, setHoneypot] = useState(""); // Hidden field for bots
+  const [formLoadTime, setFormLoadTime] = useState<number>(0);
+
+  // Track when form loads (for spam detection)
+  useEffect(() => {
+    setFormLoadTime(Date.now());
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("submitting");
 
     try {
-      // If webhook URL provided (Tier 2 customer), send to n8n
-      if (webhookUrl) {
-        await fetch(webhookUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ...formData,
-            businessName,
-            submittedAt: new Date().toISOString(),
-          }),
-        });
+      // Submit to Cloudflare Pages Function API
+      // This handles both Supabase storage (all tiers) and webhook (Tier 2+)
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          businessName,
+          webhookUrl: webhookUrl || null,
+          honeypot, // Hidden field to catch bots
+          submissionTime: formLoadTime, // For time-based spam detection
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setStatus("success");
+        setFormData({ name: "", phone: "", email: "", message: "" });
+        setHoneypot(""); // Reset honeypot
+
+        // Reset success message after 5 seconds
+        setTimeout(() => setStatus("idle"), 5000);
+      } else {
+        setStatus("error");
+        setTimeout(() => setStatus("idle"), 5000);
       }
-
-      // For $79 tier (no webhook), could store in Supabase or just show success
-      // For now, just show success message
-      setStatus("success");
-      setFormData({ name: "", phone: "", email: "", message: "" });
-
-      // Reset success message after 5 seconds
-      setTimeout(() => setStatus("idle"), 5000);
     } catch (error) {
       console.error("Form submission error:", error);
       setStatus("error");
@@ -69,30 +83,42 @@ export const ContactForm: React.FC<ContactFormProps> = ({
     >
       {/* Header */}
       <div className="text-center mb-12">
-        <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-4">
+        <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
           Ready to Get Started?
         </h2>
-        <p className="text-lg text-zinc-600 mb-2">
+        <p className="text-lg text-muted-foreground mb-2">
           Call us at{" "}
           <a
             href={`tel:${phone.replace(/\D/g, "")}`}
-            className="font-semibold text-zinc-900 hover:underline"
+            className="font-semibold text-foreground hover:underline"
           >
             {phone}
           </a>
         </p>
-        <p className="text-base text-zinc-600">
+        <p className="text-base text-muted-foreground">
           or fill out the form below. We'll get back to you within 24 hours.
         </p>
       </div>
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Honeypot field - hidden from real users, catches bots */}
+        <input
+          type="text"
+          name="website"
+          value={honeypot}
+          onChange={(e) => setHoneypot(e.target.value)}
+          style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px' }}
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+        />
+
         {/* Name */}
         <div>
           <label
             htmlFor="name"
-            className="block text-sm font-medium text-zinc-700 mb-2"
+            className="block text-sm font-medium text-foreground mb-2"
           >
             Your Name
           </label>
@@ -103,7 +129,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
             value={formData.name}
             onChange={handleChange}
             required
-            className="w-full px-4 py-3 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-zinc-900"
+            className="w-full px-4 py-3 border bg-background rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent text-foreground"
             placeholder="John Smith"
           />
         </div>
@@ -112,7 +138,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
         <div>
           <label
             htmlFor="phone"
-            className="block text-sm font-medium text-zinc-700 mb-2"
+            className="block text-sm font-medium text-foreground mb-2"
           >
             Phone Number
           </label>
@@ -123,7 +149,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
             value={formData.phone}
             onChange={handleChange}
             required
-            className="w-full px-4 py-3 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-zinc-900"
+            className="w-full px-4 py-3 border bg-background rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent text-foreground"
             placeholder="(555) 123-4567"
           />
         </div>
@@ -132,7 +158,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
         <div>
           <label
             htmlFor="email"
-            className="block text-sm font-medium text-zinc-700 mb-2"
+            className="block text-sm font-medium text-foreground mb-2"
           >
             Email
           </label>
@@ -143,7 +169,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
             value={formData.email}
             onChange={handleChange}
             required
-            className="w-full px-4 py-3 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-zinc-900"
+            className="w-full px-4 py-3 border bg-background rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent text-foreground"
             placeholder="john@example.com"
           />
         </div>
@@ -152,7 +178,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
         <div>
           <label
             htmlFor="message"
-            className="block text-sm font-medium text-zinc-700 mb-2"
+            className="block text-sm font-medium text-foreground mb-2"
           >
             Message
           </label>
@@ -163,7 +189,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
             onChange={handleChange}
             required
             rows={4}
-            className="w-full px-4 py-3 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-zinc-900 resize-none"
+            className="w-full px-4 py-3 border bg-background rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent text-foreground resize-none"
             placeholder="Tell us about your project..."
           />
         </div>
@@ -172,15 +198,15 @@ export const ContactForm: React.FC<ContactFormProps> = ({
         <button
           type="submit"
           disabled={status === "submitting"}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-4 px-6 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {status === "submitting" ? "Sending..." : "Send Message"}
         </button>
 
         {/* Success Message */}
         {status === "success" && (
-          <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-            <p className="text-green-800 font-medium">
+          <div className="p-4 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg">
+            <p className="text-green-800 dark:text-green-200 font-medium">
               Message sent! We'll get back to you soon.
             </p>
           </div>
@@ -188,8 +214,8 @@ export const ContactForm: React.FC<ContactFormProps> = ({
 
         {/* Error Message */}
         {status === "error" && (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-800 font-medium">
+          <div className="p-4 bg-destructive/10 border border-destructive/50 rounded-lg">
+            <p className="text-destructive font-medium">
               Something went wrong. Please try calling us instead.
             </p>
           </div>
@@ -197,7 +223,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
       </form>
 
       {/* Footer Text */}
-      <p className="text-center text-sm text-zinc-500 mt-8">
+      <p className="text-center text-sm text-muted-foreground mt-8">
         We respond fast. Most calls returned same day.
       </p>
     </div>

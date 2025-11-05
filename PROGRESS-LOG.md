@@ -3,9 +3,9 @@
 ## November 3, 2025 - Session 1: Core Libraries & Foundation
 
 ### Overview
-Started adapting the existing web agency portfolio template into a standardized HVAC/Plumbing/Electrician website template for the $79 Website-First campaign.
+Started adapting the existing web agency portfolio template into a standardized HVAC/Plumbing/Electrician website template for the $249 Website-First campaign.
 
-**Goal:** Maximum templated copy, 30-minute deployment per customer, variable substitution only (no AI generation needed for $79 tier).
+**Goal:** Maximum templated copy, 30-minute deployment per customer, variable substitution only (no AI generation needed for $249 tier).
 
 ---
 
@@ -152,7 +152,7 @@ Call {{PHONE}} today for a free quote.
 
 ### 5. About Component (`components/About.tsx`)
 
-**Purpose:** Generic about section for $79 tier
+**Purpose:** Generic about section for $249 tier
 
 **Features Implemented:**
 - Uses `generateAboutContent()` from variables.ts
@@ -161,7 +161,7 @@ Call {{PHONE}} today for a free quote.
 - Generic but professional copy
 
 **Design Decisions:**
-- **$79 tier:** Generic template (what we built)
+- **$249 tier:** Generic template (what we built)
 - **Premium upsell:** Custom content via online portal (future feature)
 - Simple, trustworthy, no fake claims ("20 years experience", etc.)
 
@@ -184,7 +184,7 @@ Call {{PHONE}} today for a free quote.
 - Still converts well with strong CTA + form
 
 ### 3. About Section
-**Decision:** Generic template for $79 tier
+**Decision:** Generic template for $249 tier
 - Professional but standardized copy
 - No specific claims we can't back up
 - Premium upsell: Custom about content via online portal
@@ -198,7 +198,7 @@ Call {{PHONE}} today for a free quote.
 
 ### 5. Deployment Strategy
 **Decision:** Maximum templated copy, minimal customization
-- $79 tier = template + variable substitution only
+- $249 tier = template + variable substitution only
 - No AI generation needed (faster, cheaper, more reliable)
 - Custom content = premium upsell
 - Target: 30-minute deployment per customer
@@ -296,7 +296,7 @@ hvac-template/
 - ⏳ SEO + AI agent optimized (structured data ready, needs integration)
 
 ### Business Goals
-- ✅ $79 tier uses only template content (achieved)
+- ✅ $249 tier uses only template content (achieved)
 - ✅ Premium upsell path defined (custom colors, about, testimonials)
 - ⏳ Scalable deployment process (testing pending)
 - ⏳ Works for HVAC, Plumbing, Electrician (verify during testing)

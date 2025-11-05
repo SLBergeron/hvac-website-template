@@ -1,33 +1,68 @@
-import { Container } from "@/components/Container";
-import { CallToAction } from "@/components/CTA";
-import Hero from "@/components/Hero";
-import { Products } from "@/components/Products";
+import { HeroWithGrid } from "@/components/HeroWithGrid";
+import { PricingTransparency } from "@/components/PricingTransparency";
+import { WhyChooseUs } from "@/components/WhyChooseUs";
+import { WhatToExpect } from "@/components/WhatToExpect";
 import { Services } from "@/components/Services";
-import { Testimonial } from "@/components/Testimonial";
-import { testimonials } from "constants/testimonials";
+import { FAQ } from "@/components/FAQ";
+import { About } from "@/components/About";
+import { ContactForm } from "@/components/ContactForm";
+import { generateAboutContent } from "@/lib/variables";
+import {
+  getBusinessInfo,
+  getContactInfo,
+  getFormattedPhone,
+  getHours,
+  getBusinessType,
+} from "@/lib/template-config";
 import type { NextPage } from "next";
 
 export default function Home() {
-  return (
-    <Container>
-      <Hero />
-      <Testimonial testimonial={testimonials[0]} />
-      <div id="work" className=" max-w-6xl mx-auto antialiased">
-        <h2 className="font-bold text-4xl text-center text-slate-700 capitalize">
-          Recent{" "}
-          <span className="relative bg-clip-text text-transparent bg-gradient-to-r from-purple-700 to-pink-500 z-10">
-            Work
-          </span>
-        </h2>
-        <p className="text-base text-slate-500 font-normal text-center max-w-2xl mx-auto my-4">
-          A look at some of the amazing websites that we've built recently.
-        </p>
+  // Get business data from centralized config
+  const business = getBusinessInfo();
+  const contact = getContactInfo();
+  const phone = getFormattedPhone();
+  const hours = getHours();
+  const businessType = getBusinessType();
 
-        <Products />
+  // Generate about content using the template
+  const aboutContent = generateAboutContent({
+    businessName: business.name,
+    phone: phone,
+    city: contact.address.city,
+    state: contact.address.stateCode,
+    businessType: businessType,
+    hours: hours.formatted,
+    services: [], // Services come from service-descriptions.ts
+    domain: "", // Not needed for about content
+  });
+
+  return (
+    <div className="w-full">
+      {/* Hero with integrated navbar */}
+      <HeroWithGrid />
+
+      {/* Psychology-driven section order */}
+      <PricingTransparency businessType={businessType} />
+      <WhyChooseUs licenseNumber={business.licenseNumber} />
+      <WhatToExpect businessType={businessType} />
+
+      <div className="max-w-7xl mx-auto px-4">
+        <Services />
       </div>
-      <Testimonial testimonial={testimonials[1]} />
-      <Services />
-      <CallToAction />
-    </Container>
+
+      <FAQ
+        phone={phone}
+        city={contact.address.city}
+        businessType={businessType}
+      />
+
+      <div className="max-w-7xl mx-auto px-4">
+        <About content={aboutContent} hours={hours.formatted} />
+        <ContactForm
+          phone={phone}
+          businessName={business.name}
+        />
+      </div>
+    </div>
   );
 }

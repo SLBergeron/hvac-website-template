@@ -78,6 +78,9 @@ export function substituteVariables(
  * Output: "(773) 555-1234"
  */
 export function formatPhone(phone: string): string {
+  // Handle undefined or null
+  if (!phone) return '';
+
   // Remove all non-digits
   const digits = phone.replace(/\D/g, '');
 
@@ -96,6 +99,9 @@ export function formatPhone(phone: string): string {
  * Output: "+17735551234"
  */
 export function formatPhoneForLink(phone: string): string {
+  // Handle undefined or null
+  if (!phone) return '';
+
   const digits = phone.replace(/\D/g, '');
   return `+1${digits}`;
 }
@@ -224,7 +230,7 @@ function formatHoursForSchema(hours: string): string | undefined {
 
 /**
  * Generate generic about section content
- * $79 tier = generic template
+ * $249 tier = generic template
  * Premium upsell = custom content via online portal
  */
 export function generateAboutContent(data: BusinessData): string {
@@ -244,7 +250,7 @@ Call ${formatPhone(data.phone)} today for a free quote.`;
 
 /**
  * Default color schemes by business type
- * Neutral colors (gray/zinc) are the default for $79 tier
+ * Neutral colors (gray/zinc) are the default for $249 tier
  * Custom colors = premium upsell via online portal
  */
 export const DEFAULT_COLOR_SCHEMES: Record<string, ColorScheme> = {

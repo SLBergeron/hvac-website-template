@@ -1,102 +1,119 @@
 "use client";
-import { services } from "constants/services";
-import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
-import React from "react";
-import { GridPattern } from "./GridPattern";
+import { cn } from "@/lib/utils";
+import {
+  IconSnowflake,
+  IconFlame,
+  IconTool,
+  IconCheckbox,
+  IconAlertCircle
+} from "@tabler/icons-react";
+import { HVAC_SERVICES } from "@/lib/service-descriptions";
+import {
+  getPrimaryColor,
+  getSuccessColor,
+  getColors,
+} from "@/lib/template-config";
+
+// Get colors from template
+const primaryColor = getPrimaryColor();
+const successColor = getSuccessColor();
+const colors = getColors();
+
+// HVAC services to display (using the service descriptions library)
+const hvacServices = [
+  {
+    ...HVAC_SERVICES['AC Repair'],
+    icon: <IconSnowflake className="h-8 w-8" style={{ color: colors.accent.cold.main }} stroke={1.5} />,
+  },
+  {
+    ...HVAC_SERVICES['Heating Repair'],
+    icon: <IconFlame className="h-8 w-8" style={{ color: colors.accent.hot.main }} stroke={1.5} />,
+  },
+  {
+    ...HVAC_SERVICES['Installation'],
+    icon: <IconTool className="h-8 w-8" style={{ color: primaryColor }} stroke={1.5} />,
+  },
+  {
+    ...HVAC_SERVICES['Maintenance'],
+    icon: <IconCheckbox className="h-8 w-8" style={{ color: successColor }} stroke={1.5} />,
+  },
+  {
+    ...HVAC_SERVICES['Emergency Service'],
+    icon: <IconAlertCircle className="h-8 w-8" style={{ color: colors.danger }} stroke={1.5} />,
+  },
+];
 
 export const Services = () => {
   return (
     <div
       id="services"
-      className=" max-w-7xl mx-auto  antialiased py-10 md:py-20"
+      className="max-w-7xl mx-auto antialiased py-10 md:py-20"
     >
-      <div className="mx-auto max-w-2xl sm:text-center pb-10 ">
-        <h2 className="text-3xl font-medium tracking-tight text-gray-900">
-          We handle just about everything!
+      <div className="mx-auto max-w-2xl sm:text-center pb-10">
+        <h2 className="text-3xl font-medium tracking-tight text-foreground">
+          Our HVAC Services
         </h2>
-        <p className="mt-2 text-lg text-gray-600">
-          We handle everything from design to deployment to get your website
-          shipped and ready to go!
+        <p className="mt-2 text-lg text-muted-foreground">
+          From emergency repairs to new installations, we keep your home comfortable year-round.
         </p>
       </div>
-      <ul
-        role="list"
-        className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-6 text-sm sm:mt-20 sm:grid-cols-2 md:gap-y-10 lg:max-w-none lg:grid-cols-3"
-      >
-        {services.map((service, idx) => (
-          <Service key={`service-${idx}`} service={service} />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 relative z-10 py-10 max-w-7xl mx-auto">
+        {hvacServices.map((service, index) => (
+          <Feature key={service.title} {...service} index={index} />
         ))}
-      </ul>
+      </div>
     </div>
   );
 };
 
-const Service = ({ service }: any) => {
-  let mouseX = useMotionValue(0);
-  let mouseY = useMotionValue(0);
-
-  function onMouseMove({ currentTarget, clientX, clientY }: any) {
-    let { left, top } = currentTarget.getBoundingClientRect();
-    mouseX.set(clientX - left);
-    mouseY.set(clientY - top);
-  }
-
+const Feature = ({
+  title,
+  description,
+  icon,
+  index,
+}: {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  index: number;
+}) => {
   return (
-    <li
-      onMouseMove={onMouseMove}
-      className="group rounded-2xl border border-gray-200 p-8 relative"
+    <div
+      className={cn(
+        "flex flex-col lg:border-r py-10 relative group/feature dark:border-neutral-800",
+        (index === 0 || index === 3) && "lg:border-l dark:border-neutral-800",
+        index < 3 && "lg:border-b dark:border-neutral-800"
+      )}
     >
-      <ServicePattern {...service.pattern} mouseX={mouseX} mouseY={mouseY} />
-      <div className="relative z-10">
-        <span>{service.icon}</span>
-        <h3 className="mt-6 font-semibold text-gray-900 tracking-wide leading-6 antialiased">
-          {service.title}
-        </h3>
-        <p className="mt-2 text-gray-700 tracking-wide leading-6 antialiased">
-          {service.description}
-        </p>
+      {index < 3 && (
+        <div className="opacity-0 group-hover/feature:opacity-100 transition duration-200 absolute inset-0 h-full w-full bg-gradient-to-t from-neutral-100 dark:from-neutral-800 to-transparent pointer-events-none" />
+      )}
+      {index >= 3 && (
+        <div className="opacity-0 group-hover/feature:opacity-100 transition duration-200 absolute inset-0 h-full w-full bg-gradient-to-b from-neutral-100 dark:from-neutral-800 to-transparent pointer-events-none" />
+      )}
+      <div className="mb-4 relative z-10 px-10 text-neutral-600 dark:text-neutral-400">
+        {icon}
       </div>
-    </li>
-  );
-};
-
-function ServicePattern({ mouseX, mouseY, ...gridProps }: any) {
-  let maskImage = useMotionTemplate`radial-gradient(300px at ${mouseX}px ${mouseY}px, white, transparent)`;
-  let style = { maskImage, WebkitMaskImage: maskImage };
-
-  return (
-    <div className="pointer-events-none">
-      <div className="absolute inset-0 rounded-2xl transition duration-300 [mask-image:linear-gradient(white,transparent)] group-hover:opacity-50">
-        <GridPattern
-          width={72}
-          height={56}
-          x="50%"
-          className="absolute inset-x-0 inset-y-[-30%] h-[160%] w-full skew-y-[-18deg] fill-black/[0.02] stroke-black/5 "
-          {...gridProps}
+      <div className="text-lg font-bold mb-2 relative z-10 px-10">
+        <div
+          className="absolute left-0 inset-y-0 h-6 group-hover/feature:h-8 w-1 rounded-tr-full rounded-br-full bg-neutral-300 dark:bg-neutral-700 transition-all duration-200 origin-center"
+          style={{
+            backgroundColor: 'var(--hover-accent, rgb(212 212 212))',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = primaryColor;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--hover-accent, rgb(212 212 212))';
+          }}
         />
+        <span className="group-hover/feature:translate-x-2 transition duration-200 inline-block text-neutral-800 dark:text-neutral-100">
+          {title}
+        </span>
       </div>
-      <motion.div
-        className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#D7EDEA] to-[#F4FBDF] opacity-0 transition duration-300 group-hover:opacity-100 "
-        style={style}
-      />
-      <motion.div
-        className="absolute inset-0 rounded-2xl opacity-0 mix-blend-overlay transition duration-300 group-hover:opacity-100"
-        style={style}
-      >
-        <GridPattern
-          width={72}
-          height={56}
-          x="50%"
-          className="absolute inset-x-0 inset-y-[-30%] h-[160%] w-full skew-y-[-18deg] fill-black/50 stroke-black/70 "
-          {...gridProps}
-        />
-      </motion.div>
+      <p className="text-sm text-neutral-600 dark:text-neutral-300 max-w-xs relative z-10 px-10">
+        {description}
+      </p>
     </div>
-  );
-}
-
-export const HiddenClassesHack = () => {
-  return (
-    <div className="text-green-500 h-8 w-8 hidden text-gray-500 stroke-gray-500"></div>
   );
 };

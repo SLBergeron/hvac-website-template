@@ -1,49 +1,72 @@
-import LogoMain from "icons/logo";
-import React from "react";
+"use client";
 
-import HeroFeatures from "./HeroFeatures";
+import React from "react";
+import { getCompleteHeroContent } from "@/lib/seasonal-hero";
+import {
+  getContactInfo,
+  getFormattedPhone,
+  getPhoneLink,
+  getBusinessType,
+  getStateCode,
+  getPrimaryColor,
+  getPrimaryHoverColor,
+} from "@/lib/template-config";
 
 const Hero = () => {
+  // Get data from centralized config
+  const contact = getContactInfo();
+  const phone = getFormattedPhone();
+  const phoneLink = getPhoneLink();
+  const primaryColor = getPrimaryColor();
+  const primaryHoverColor = getPrimaryHoverColor();
+
+  // Get seasonal hero content based on current date and location
+  const heroContent = getCompleteHeroContent(
+    getBusinessType(),
+    getStateCode()
+  );
+
+  const [isHovered, setIsHovered] = React.useState(false);
+
   return (
-    <div className="relative pb-10 flex flex-col items-center justify-center  md:px-8 overflow-hidden">
-      <div className="relative flex flex-col items-center justify-center mt-10">
-        <LogoMain className="h-20 w-10 mb-4 text-zinc-500" />
-        <h1 className="text-4xl md:text-7xl font-bold mb-14 relative text-center text-zinc-700">
-          Web Apps that{" "}
-          <span className="relative bg-clip-text text-transparent bg-gradient-to-r from-purple-700 to-pink-500 z-10">
-            Make Sense.
-          </span>
+    <div className="relative pb-20 pt-10 flex flex-col items-center justify-center px-4 md:px-8 overflow-hidden">
+      <div className="relative flex flex-col items-center justify-center max-w-4xl mx-auto">
+        {/* Headline */}
+        <h1 className="text-4xl md:text-6xl font-bold mb-6 relative text-center text-zinc-800 leading-tight dark:text-white">
+          {heroContent.headline}
         </h1>
-        <h2 className="relative font-regular text-base text-zinc-500 tracking-wide mb-20 text-center max-w-3xl mx-auto antialiased">
-          We build website for your business that actually converts. Wonderfully
-          designed, masterfully created websites and layouts, created by the
-          founders of{" "}
-          <a
-            href="https://google.com"
-            className="  font-semibold text-zinc-700"
-          >
-            Google{" "}
-          </a>
-          and{" "}
-          <a
-            href="https://facebook.com"
-            className="  font-semibold text-zinc-700"
-          >
-            Facebook.
-          </a>{" "}
-          The ideal beginning stage for your next project.
-        </h2>
-      </div>
-      <HeroFeatures />
-      <button className="relative z-10 group mb-20">
-        <div className="absolute -inset-0.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200 animate-tilt"></div>
+
+        {/* Subheadline */}
+        <p className="text-xl md:text-2xl font-normal text-zinc-600 mb-8 text-center max-w-2xl dark:text-zinc-300">
+          {heroContent.subheadline}
+        </p>
+
+        {/* Business name and location */}
+        <p className="text-base text-zinc-500 mb-10 text-center dark:text-zinc-400">
+          Serving {contact.address.city} and surrounding areas
+        </p>
+
+        {/* Call to Action Button */}
         <a
-          className="relative z-10 px-6 py-3 bg-white text-zinc-700 font-bold rounded-lg block"
-          href="#work"
+          href={phoneLink}
+          className="inline-block px-8 py-4 text-white text-lg font-semibold rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl mb-4"
+          style={{
+            backgroundColor: isHovered ? primaryHoverColor : primaryColor,
+          }}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
         >
-          Explore Work
+          Call {phone}
         </a>
-      </button>
+
+        {/* Secondary CTA */}
+        <a
+          href="#contact"
+          className="text-zinc-600 hover:text-zinc-800 text-base font-medium underline"
+        >
+          Or send us a message
+        </a>
+      </div>
     </div>
   );
 };

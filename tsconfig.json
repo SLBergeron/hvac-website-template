@@ -37,6 +37,9 @@
       ],
       "@/requests/*": [
         "requests/*"
+      ],
+      "@/config/*": [
+        "config/*"
       ]
     },
     "plugins": [

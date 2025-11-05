@@ -7,13 +7,13 @@
 
 ## What We're Building
 
-Transforming the existing web agency portfolio template into a **standardized HVAC/Plumbing/Electrician website template** for the $79 Website-First campaign.
+Transforming the existing web agency portfolio template into a **standardized HVAC/Plumbing/Electrician website template** for the $249 Website-First campaign.
 
 **Strategy:**
 - Maximum templated copy (same for everyone)
 - Variable substitution only: {{BUSINESS_NAME}}, {{PHONE}}, etc.
 - 30-minute deployment per customer
-- Custom content = premium upsell (not $79 tier)
+- Custom content = premium upsell (not $249 tier)
 
 ---
 
