@@ -95,7 +95,8 @@ export default function RootLayout({
         {/* Template Preview Banner - appears on all pages */}
         <StickyBanner className="bg-gradient-to-r from-emerald-500 to-emerald-600">
           <p className="text-white drop-shadow-md">
-            <span className="font-semibold">Template Preview:</span> This is what your business website could look like.{" "}
+            <span className="font-semibold">Template Preview</span>
+            <span className="hidden sm:inline">: This is what your business website could look like.</span>{" "}
             <a
               href="https://getmywebsite.io"
               target="_blank"
