@@ -9,6 +9,7 @@ import {
   getFormattedPhone,
   getSEO,
 } from "@/lib/template-config";
+import { Analytics } from "@vercel/analytics/next";
 
 // Get business data for metadata
 const business = getBusinessInfo();
@@ -107,6 +108,7 @@ export default function RootLayout({
         </StickyBanner>
         {children}
         <Footer />
+        <Analytics />
       </body>
     </html>
   );
